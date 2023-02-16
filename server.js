@@ -2,6 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const authRoutes = require("./routes/auth");
+const hotelRoutes = require("./routes/hotel");
+const roomsRoutes = require("./routes/rooms");
+const usersRoutes = require("./routes/users");
 
 // express app
 const app = express();
@@ -24,8 +28,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// connect to db
+// When we fire a request to this path run the workoutRoutes
+// routes
+app.use("/api/auth", authRoutes);
+app.use("/api/hotel", hotelRoutes);
+app.use("/api/rooms", roomsRoutes);
+app.use("/api/user", usersRoutes);
 
+// connect to db
 mongoose.set("strictQuery", false);
 
 mongoose
