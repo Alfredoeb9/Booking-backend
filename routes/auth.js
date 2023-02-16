@@ -1,9 +1,8 @@
 const express = require("express");
+const { register } = require("../controller/authController");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  console.log("This is the auth file");
-});
+router.post("/register", register);
 
 module.exports = router;

@@ -1,63 +1,29 @@
 const express = require("express");
-const Hotel = require("../models/Hotel");
+const {
+  getHotels,
+  getOneHotel,
+  createHotel,
+  updateHotel,
+  deleteHotel,
+} = require("../controller/hotelController");
+const Hotel = require("../models/hotelModel");
+const { handleError } = require("../utils/errorHandler");
 
 const router = express.Router();
 
 // GET ALL
-router.get("/", async (req, res) => {
-  try {
-    const allHotels = await Hotel.find();
-    res.status(200).json(allHotels);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
+router.get("/", getHotels);
 
 // GET
-router.get("/:id", async (req, res) => {
-  try {
-    const hotel = await Hotel.findById(req.params.id);
-    res.status(200).json(hotel);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
+router.get("/:id", getOneHotel);
 
 // CREATE NEW HOTEL
-router.post("/", async (req, res) => {
-  const newHotel = new Hotel(req.body);
-  try {
-    const savedHotel = await newHotel.save();
-    res.status(200).json(savedHotel);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
+router.post("/", createHotel);
 
 // UPDATE HOTEL
-router.put("/:id", async (req, res) => {
-  try {
-    const updatedHotel = await Hotel.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    );
-    res.status(200).json(updatedHotel);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
+router.put("/:id", updateHotel);
 
 // DELETE HOTEL
-router.delete("/:id", async (req, res) => {
-  try {
-    await Hotel.findByIdAndDelete(req.params.id);
-    res.status(200).json({ msg: "Hotel has been deleted" });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
+router.delete("/:id", deleteHotel);
 
 module.exports = router;
