@@ -42,10 +42,30 @@ const verifyUser = async (req, res, next) => {
   try {
     const user = await verifyToken(token, process.env.JWT_SECRET, next);
 
-    console.log("user", user);
-    console.log("params", req.params.id);
-
     if (user._id == req.params.id || user.isAdmin) {
+      return next();
+    } else {
+      if (err) return next(handleError(403, `${err}`));
+    }
+  } catch (error) {
+    return next(handleError(401, "Request is not authorized"));
+  }
+};
+
+const verifyAdmin = async (req, res, next) => {
+  const { cookie } = req.headers;
+
+  if (!cookie) {
+    return next(handleError(401, "Authorization token required"));
+  }
+
+  // split the auth value and split on the space
+  let token = cookie.split("access_token=")[1];
+
+  try {
+    const user = await verifyToken(token, process.env.JWT_SECRET, next);
+
+    if (user.isAdmin) {
       return next();
     } else {
       if (err) return next(handleError(403, `${err}`));
@@ -81,4 +101,4 @@ const verifyUser = async (req, res, next) => {
 //   }
 // };
 
-module.exports = { requireAuth, verifyUser };
+module.exports = { requireAuth, verifyUser, verifyAdmin };

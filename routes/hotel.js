@@ -6,8 +6,7 @@ const {
   updateHotel,
   deleteHotel,
 } = require("../controller/hotelController");
-const Hotel = require("../models/hotelModel");
-const { handleError } = require("../utils/errorHandler");
+const { verifyAdmin } = require("../middleware/requireAuth");
 
 const router = express.Router();
 
@@ -18,12 +17,12 @@ router.get("/", getHotels);
 router.get("/:id", getOneHotel);
 
 // CREATE NEW HOTEL
-router.post("/", createHotel);
+router.post("/", verifyAdmin, createHotel);
 
 // UPDATE HOTEL
-router.put("/:id", updateHotel);
+router.put("/:id", verifyAdmin, updateHotel);
 
 // DELETE HOTEL
-router.delete("/:id", deleteHotel);
+router.delete("/:id", verifyAdmin, deleteHotel);
 
 module.exports = router;
