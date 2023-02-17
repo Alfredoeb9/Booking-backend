@@ -27,6 +27,32 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+// Static login method
+userSchema.statics.login = async function (email, password) {
+  // Validation
+  if (!email || !password) {
+    throw Error("All fields must be filled");
+  }
+
+  // Find an email within the database
+  const user = await this.findOne({ email });
+
+  // if no user exists then throw error
+
+  if (!user) {
+    throw Error("Incorrect Email, try signing up!");
+  }
+
+  // need to march the password with hash password
+  const passwordMatch = await bcrypt.compare(password, user.password);
+
+  if (!passwordMatch) {
+    throw Error("Incorrect login credentials");
+  }
+
+  return user;
+};
+
 // Static register method
 userSchema.statics.register = async function (
   username,

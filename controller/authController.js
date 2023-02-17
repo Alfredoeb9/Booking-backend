@@ -1,10 +1,8 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRATION_MINUTES,
-  });
+const createToken = (_id, isAdmin) => {
+  return jwt.sign({ _id, isAdmin: isAdmin }, process.env.JWT_SECRET);
 };
 
 const register = async (req, res, next) => {
@@ -25,6 +23,32 @@ const register = async (req, res, next) => {
   }
 };
 
+const login = async (req, res, next) => {
+  console.log(req.body);
+  const { email } = req.body;
+  try {
+    console.log("running");
+    const user = await User.login(email, req.body.password);
+
+    const { password, isAdmin, ...otherDetails } = user._doc;
+
+    // create a token per user
+    const token = createToken(user._id, isAdmin);
+
+    // return the users info down below
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json({ email, token, ...otherDetails });
+    // await newUser.save();
+    // res.status(201).send("User has been created");
+  } catch (error) {
+    console.log("next ran");
+    next(error);
+  }
+};
+
 module.exports = {
   register,
+  login,
 };
