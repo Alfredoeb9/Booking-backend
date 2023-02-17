@@ -39,14 +39,17 @@ const verifyUser = async (req, res, next) => {
   // split the auth value and split on the space
   let token = cookie.split("access_token=")[1];
 
-  console.log(token);
-
-  next();
-
   try {
     const user = await verifyToken(token, process.env.JWT_SECRET, next);
 
-    console.log(user);
+    console.log("user", user);
+    console.log("params", req.params.id);
+
+    if (user._id == req.params.id || user.isAdmin) {
+      return next();
+    } else {
+      if (err) return next(handleError(403, `${err}`));
+    }
   } catch (error) {
     return next(handleError(401, "Request is not authorized"));
   }
